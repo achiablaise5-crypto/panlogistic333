@@ -2,7 +2,11 @@
     "outputDirectory": ".",
     "rewrites": [
         {
-            "source": "/(.*)",
+            "source": "/api/:path*",
+            "destination": "/api/index.js"
+        },
+        {
+            "source": "/:path*",
             "destination": "/index.html"
         }
     ],
