@@ -150,15 +150,12 @@
             submitBtn.textContent = 'Logging in...';
             
             try {
-                const response = await fetch(`${API_URL}/auth/login`, {
+                const data = await safeFetch(`${CONFIG.API_URL}/auth/login`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
                 
-                const data = await response.json();
-                
-                if (response.ok && data.success) {
+                if (data.success) {
                     // Store token
                     localStorage.setItem('adminToken', data.data.token);
                     localStorage.setItem('adminUser', JSON.stringify(data.data.user));

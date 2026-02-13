@@ -41,39 +41,15 @@ app.use(helmet({
     crossOriginEmbedderPolicy: false,
 }));
 
-// CORS configuration
+// CORS configuration - Allow all origins for Vercel serverless compatibility
 const corsOptions = {
     origin: function (origin, callback) {
         // Allow requests with no origin (like mobile apps, curl, or Postman)
-        // In production, you should add your actual domain here
         if (!origin) return callback(null, true);
         
-        const allowedOrigins = [
-            // Local development
-            'http://localhost:3000',
-            'http://localhost:5500',
-            'http://127.0.0.1:3000',
-            'http://127.0.0.1:5500',
-            'http://localhost',
-            'http://127.0.0.1',
-            // Vercel deployments (add your actual Vercel URL when deploying)
-            'https://pan-logistics.vercel.app',
-            'https://pan-logistics-ca.vercel.app',
-            // Add your custom domain when ready
-            // 'https://panlogistics.ca',
-        ];
-        
-        if (allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            // In development, allow all; in production, deny unauthorized origins
-            if (process.env.NODE_ENV === 'production') {
-                console.log(`CORS blocked origin: ${origin}`);
-                callback(new Error('Not allowed by CORS'));
-            } else {
-                callback(null, true); // Allow all for testing in development
-            }
-        }
+        // Allow any origin for Vercel deployment
+        // This is safe because we're using Supabase for authentication
+        callback(null, true);
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],

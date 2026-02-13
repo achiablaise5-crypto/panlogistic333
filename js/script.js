@@ -102,24 +102,46 @@ Description: All JavaScript functionality for the logistics website
     // ==========================================================================
 
     /**
-     * Make API request
+     * Make API request with safe JSON parsing
      */
     async function apiRequest(endpoint, options = {}) {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
-            ...options
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(data.message || 'Request failed');
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    ...options.headers
+                },
+                ...options
+            });
+            
+            // Get response text first (safer than direct json())
+            const responseText = await response.text();
+            
+            // Check if response is empty
+            if (!responseText || responseText.trim() === '') {
+                throw new Error('Empty response from server');
+            }
+            
+            // Try to parse JSON
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError, 'Response:', responseText);
+                throw new Error('Invalid JSON response from server');
+            }
+            
+            // Check response status
+            if (!response.ok) {
+                throw new Error(data.message || `HTTP error ${response.status}`);
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('API request error:', error);
+            throw error;
         }
-        
-        return data;
     }
 
     /**

@@ -285,7 +285,16 @@
     <script src="js/script.js"></script>
     <script src="js/language.js"></script>
     <script>
-        const API_URL = 'http://localhost:3000/api';
+        // Use config API URL (already set by js/config.js)
+        const API_URL = window.CONFIG ? window.CONFIG.API_URL : '/api';
+        
+        // Safe fetch wrapper
+        const safeFetch = window.safeFetch || async function(url, options = {}) {
+            const response = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', ...options.headers } });
+            const text = await response.text();
+            if (!text) throw new Error('Empty response');
+            return JSON.parse(text);
+        };
 
         // Check for single post in URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -300,8 +309,7 @@
         async function loadPosts() {
             try {
                 // Add preview=true to show all posts including drafts (for admin preview)
-                const response = await fetch(`${API_URL}/blog?preview=true`);
-                const result = await response.json();
+                const result = await safeFetch(`${API_URL}/blog?preview=true`);
 
                 const grid = document.getElementById('blogGrid');
 
@@ -346,8 +354,7 @@
         async function loadSinglePost(slug) {
             try {
                 // Add preview=true to show all posts including drafts (for admin preview)
-                const response = await fetch(`${API_URL}/blog/${slug}?preview=true`);
-                const result = await response.json();
+                const result = await safeFetch(`${API_URL}/blog/${slug}?preview=true`);
 
                 if (result.success) {
                     const post = result.data;
