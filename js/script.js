@@ -11,7 +11,7 @@ Description: All JavaScript functionality for the logistics website
     'use strict';
 
     // API Base URL - Configurable for different environments
-    const API_URL = (window.API_URL || 'http://localhost:3000/api');
+    const API_URL = (window.CONFIG && window.CONFIG.API_URL) || 'http://localhost:3000/api';
 
     // ==========================================================================
     // DOM ELEMENTS
